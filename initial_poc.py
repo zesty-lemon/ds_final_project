@@ -102,6 +102,7 @@ def read_and_clean_noaa_data() -> pd.DataFrame:
     )
     return daily
 
+# some simple NOAA plots
 def plot_noaa_data(df: pd.DataFrame):
     # plot temperature
     plt.figure(figsize=(10, 5))
@@ -119,11 +120,30 @@ def plot_noaa_data(df: pd.DataFrame):
     plt.plot(df["DATE"], df["AVG_DAILY_PRCP"], label="Average Daily Precipitation")
     plt.title("Average Daily Precipitation Over Time (New York City)")
     plt.xlabel("Date")
-    plt.ylabel("Temperature (°C)")
+    plt.ylabel("Precipitation (in)")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+
+# get & return dancability by day
+def get_danceability_df(merged_df: pd.DataFrame) -> pd.DataFrame:
+    danceability_col = next((c for c in merged_df.columns if c.lower().strip() == "danceability"), None)
+    if danceability_col is None:
+        raise KeyError("Couldn't find a 'danceability' column in Spotify data. "
+                       "Check the CSV headers or rename the column to 'danceability'.")
+    dedup = merged_df.drop_duplicates(subset=["date_dt", "song_key", "artist_key"])
+    daily_danceability = (
+        dedup
+        .dropna(subset=["date_dt", danceability_col])
+        .groupby("date_dt", as_index=False)[danceability_col]
+        .mean()
+        .rename(columns={danceability_col: "avg_danceability"})
+        .sort_values("date_dt")
+    )
+    return daily_danceability
+
 
 # --- Apple Music & Spotify Data ---
 # Read Data into Dataframes
@@ -160,13 +180,19 @@ merged_df = merged_df.dropna(subset=['track_name'])
 noaa_df = read_and_clean_noaa_data()
 plot_noaa_data(noaa_df)
 
-# Go date by date
-for date_value, group in apple_music_df.groupby('date_dt'):
-    print(f"\n=== {date_value} ===")
-    # print(group.head())
 
+danceability_df = get_danceability_df(merged_df).rename(columns={"date_dt": "DATE"})
 
-print("done")
+# make NOAA DATE match danceability_df's date
+noaa_df["DATE"] = pd.to_datetime(noaa_df["DATE"], errors="coerce").dt.date
+
+danceability_noaa = (
+    noaa_df[["DATE", "AVG_DAILY_TEMP", "AVG_DAILY_PRCP"]]
+    .merge(danceability_df, on="DATE", how="inner")
+    .sort_values("DATE")
+)
+
+print("Done")
 
 
 
