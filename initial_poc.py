@@ -7,6 +7,7 @@ import unicodedata
 
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 
 # read apple music dataset into dataframe
 def get_apple_music_as_df() -> pd.DataFrame:
@@ -79,6 +80,52 @@ def normalize_for_join(s: str) -> str:
     return s
 
 
+def read_and_clean_noaa_data() -> pd.DataFrame:
+    file_path = "data/noaa/new_york_city/4138636.csv"
+    df = pd.read_csv(file_path, low_memory=False)
+    df = df[["DATE", "STATION", "TMAX", "TMIN", "TAVG", "PRCP"]]
+    # force datetime
+    df["DATE"] = pd.to_datetime(df["DATE"], errors="coerce")
+    # force numeric on temp columns
+    for col in ["TMAX", "TMIN", "TAVG", "PRCP"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    # manually fudge missing temp values
+    df["TAVG"] = df["TAVG"].fillna((df["TMAX"] + df["TMIN"]) / 2)
+    # drop rows with no valid TAVG
+    df = df.dropna(subset=["TAVG", "DATE"])
+    # average all daily temperatures across stations on that day
+    daily = (
+        df.groupby("DATE", as_index=False)
+        .agg({"TAVG": "mean", "PRCP": "mean"})
+        .rename(columns={"TAVG": "AVG_DAILY_TEMP", "PRCP": "AVG_DAILY_PRCP"})
+        .sort_values("DATE")
+    )
+    return daily
+
+def plot_noaa_data(df: pd.DataFrame):
+    # plot temperature
+    plt.figure(figsize=(10, 5))
+    plt.plot(df["DATE"], df["AVG_DAILY_TEMP"], label="Average Daily Temp")
+    plt.title("Average Daily Temperature Over Time (New York City)")
+    plt.xlabel("Date")
+    plt.ylabel("Temperature (°C)")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # plot precipitation
+    plt.figure(figsize=(10, 5))
+    plt.plot(df["DATE"], df["AVG_DAILY_PRCP"], label="Average Daily Precipitation")
+    plt.title("Average Daily Precipitation Over Time (New York City)")
+    plt.xlabel("Date")
+    plt.ylabel("Temperature (°C)")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+# --- Apple Music & Spotify Data ---
 # Read Data into Dataframes
 apple_music_df = get_apple_music_as_df()
 spotify_df = get_spotify_tracks_as_df()
@@ -92,7 +139,7 @@ apple_music_df["artist_key"] = apple_music_df["ARTIST"].map(normalize_for_join)
 spotify_df["song_key"]   = spotify_df["track_name"].map(normalize_for_join)
 spotify_df["artist_key"] = spotify_df["artist_name"].map(normalize_for_join)
 
-# search_df = spotify_df[spotify_df['track_name'].str.contains("Todo de ti", case=False, na=False)]
+# search_df = spotify_df[spotify_df['track_name'].str.contains("Todo de ti", case=False, na=False)
 
 merged_df = apple_music_df.merge(
     spotify_df,
@@ -106,12 +153,17 @@ merged_df = apple_music_df.merge(
 # Spotify has them in english
 # The set of mismatches isn't massive, so we will have to just manually go through them
 # and make some mapping dictionary of japanese/korean -> english song titles/artist names
+# for now, just drop rows that don't match (takes too long now, will fix later)
 merged_df = merged_df.dropna(subset=['track_name'])
 
-# # Go date by date
-# for date_value, group in apple_music_df.groupby('date_dt'):
-#     print(f"\n=== {date_value} ===")
-#     # print(group.head())
+# --- NOAA Data ---
+noaa_df = read_and_clean_noaa_data()
+plot_noaa_data(noaa_df)
+
+# Go date by date
+for date_value, group in apple_music_df.groupby('date_dt'):
+    print(f"\n=== {date_value} ===")
+    # print(group.head())
 
 
 print("done")
