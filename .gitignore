@@ -196,5 +196,6 @@ out/
 logs/
 log/
 
+spotify_million_tracks_data.csv
 # Coverage reports
 coverage/

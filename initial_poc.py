@@ -144,6 +144,88 @@ def get_danceability_df(merged_df: pd.DataFrame) -> pd.DataFrame:
     )
     return daily_danceability
 
+#written by chatGPT, I needed some quick & dirty plots to check if this was working
+def quick_plots_and_corr(danceability_noaa: pd.DataFrame, rolling_window: int = 7) -> None:
+    df = danceability_noaa.copy()
+
+    # Correlations (Pearson & Spearman)
+    num_cols = ["avg_danceability", "AVG_DAILY_TEMP", "AVG_DAILY_PRCP"]
+    pearson_corr = df[num_cols].corr(method="pearson")
+    spearman_corr = df[num_cols].corr(method="spearman")
+
+    print("\n=== Correlations ===")
+    print("Pearson:\n", pearson_corr.round(3).to_string())
+    print("\nSpearman:\n", spearman_corr.round(3).to_string())
+
+    # --- Simple lag diagnostics: does weather lead/lag danceability?
+    # Negative lag => weather leads; Positive lag => danceability leads
+    lags = [-7, -3, -1, 0, 1, 3, 7]
+    lag_results = []
+    for L in lags:
+        shifted = df.copy()
+        shifted["dance_shift"] = shifted["avg_danceability"].shift(-L)  # align so corr is between weather_t and dance_{t+L}
+        lag_row = {
+            "lag_days": L,
+            "corr_temp": shifted["AVG_DAILY_TEMP"].corr(shifted["dance_shift"]),
+            "corr_prcp": shifted["AVG_DAILY_PRCP"].corr(shifted["dance_shift"]),
+        }
+        lag_results.append(lag_row)
+
+    print("\n=== Lag correlation (weather_t vs danceability_{t+lag}) ===")
+    for r in lag_results:
+        ct = "nan" if pd.isna(r["corr_temp"]) else f"{r['corr_temp']:.3f}"
+        cp = "nan" if pd.isna(r["corr_prcp"]) else f"{r['corr_prcp']:.3f}"
+        print(f"lag {r['lag_days']:>3}: temp={ct},  prcp={cp}")
+
+    # rolling means to de-noise series
+    df["dance_roll"] = df["avg_danceability"].rolling(rolling_window, min_periods=max(1, rolling_window // 2)).mean()
+    df["temp_roll"]  = df["AVG_DAILY_TEMP"].rolling(rolling_window, min_periods=max(1, rolling_window // 2)).mean()
+    df["prcp_roll"]  = df["AVG_DAILY_PRCP"].rolling(rolling_window, min_periods=max(1, rolling_window // 2)).mean()
+
+    # === Plots ===
+    # Danceability over time
+    plt.figure(figsize=(10, 4))
+    plt.plot(df["DATE"], df["avg_danceability"], label="Daily danceability")
+    plt.plot(df["DATE"], df["dance_roll"], label=f"{rolling_window}-day rolling mean")
+    plt.title("Average Danceability by Day")
+    plt.xlabel("Date")
+    plt.ylabel("Danceability")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # Temperature vs Danceability (scatter)
+    plt.figure(figsize=(6, 5))
+    plt.scatter(df["AVG_DAILY_TEMP"], df["avg_danceability"], s=12, alpha=0.7)
+    plt.title("Danceability vs. Avg Daily Temperature")
+    plt.xlabel("Avg Daily Temp (°C)")
+    plt.ylabel("Danceability")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+    # Precipitation vs Danceability (scatter)
+    plt.figure(figsize=(6, 5))
+    plt.scatter(df["AVG_DAILY_PRCP"], df["avg_danceability"], s=12, alpha=0.7)
+    plt.title("Danceability vs. Avg Daily Precipitation")
+    plt.xlabel("Avg Daily Precipitation")
+    plt.ylabel("Danceability")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+    # Rolling comparison plot (danceability vs temp rolling means)
+    plt.figure(figsize=(10, 4))
+    plt.plot(df["DATE"], df["dance_roll"], label="Danceability (roll)")
+    plt.plot(df["DATE"], df["temp_roll"],  label="Temp (roll)")
+    plt.title(f"Rolling Means ({rolling_window} days)")
+    plt.xlabel("Date")
+    plt.ylabel("Rolling values")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 # --- Apple Music & Spotify Data ---
 # Read Data into Dataframes
@@ -191,6 +273,8 @@ danceability_noaa = (
     .merge(danceability_df, on="DATE", how="inner")
     .sort_values("DATE")
 )
+
+quick_plots_and_corr(danceability_noaa)
 
 print("Done")
 
