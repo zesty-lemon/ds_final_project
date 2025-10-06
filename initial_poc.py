@@ -55,7 +55,7 @@ def clean_apple_music_fields(df: pd.DataFrame) -> pd.DataFrame:
 def get_spotify_tracks_as_df() -> pd.DataFrame:
     base_path = "data/"
     spotify_dir = "/spotify/"
-    input_file_spotify = os.path.join(base_path + spotify_dir, "spotify_tracks_dataset.csv")
+    input_file_spotify = os.path.join(base_path + spotify_dir, "spotify_million_tracks_data.csv")
     df = pd.read_csv(input_file_spotify)
     print("Spotify Headers:")
     print(df.columns)
@@ -79,22 +79,6 @@ def normalize_for_join(s: str) -> str:
     return s
 
 
-SINGLE_EP_SUFFIX = re.compile(r"\s*-\s*(single|ep)\b", flags=re.IGNORECASE)
-def normalize_album_for_join(s: str) -> str:
-    if pd.isna(s):
-        return ""
-    s = str(s).lower().strip()
-    s = unicodedata.normalize("NFKC", s)
-    # drop bracketed qualifiers (deluxe), (remastered), [clean], etc.
-    s = re.sub(r"[\(\[].*?[\)\]]", "", s)
-    # remove Apple-style suffixes like " - Single", " - EP"
-    s = SINGLE_EP_SUFFIX.sub("", s)
-    # keep letters/numbers from all scripts; drop punctuation
-    s = re.sub(r"[^\w\s]", "", s, flags=re.UNICODE)
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
-
-
 # Read Data into Dataframes
 apple_music_df = get_apple_music_as_df()
 spotify_df = get_spotify_tracks_as_df()
@@ -102,28 +86,27 @@ spotify_df = get_spotify_tracks_as_df()
 # Build normalized columns for Apple Music
 apple_music_df = clean_apple_music_fields(apple_music_df)
 apple_music_df["song_key"]   = apple_music_df["SONG"].map(normalize_for_join)
-apple_music_df["album_key"] = apple_music_df["ALBUM"].map(normalize_album_for_join)
-
-# apple_music_df["artist_key"] = apple_music_df["ARTIST"].map(normalize_for_join)
+apple_music_df["artist_key"] = apple_music_df["ARTIST"].map(normalize_for_join)
 
 # Build normalized columns for Spotify
 spotify_df["song_key"]   = spotify_df["track_name"].map(normalize_for_join)
-spotify_df["album_key"] = spotify_df["album_name"].map(normalize_album_for_join)
-# spotify_df["artist_key"] = spotify_df["artists"].map(normalize_for_join)
+spotify_df["artist_key"] = spotify_df["artist_name"].map(normalize_for_join)
+
+# search_df = spotify_df[spotify_df['track_name'].str.contains("Todo de ti", case=False, na=False)]
 
 merged_df = apple_music_df.merge(
     spotify_df,
+    on=["song_key", "artist_key"],
     how="left",
-    on=["song_key", "album_key"],
     suffixes=("_apple", "_spotify")
 )
 
-# merged_df = apple_music_df.merge(
-#     spotify_df,
-#     on=["song_key", "artist_key"],
-#     how="left",
-#     suffixes=("_apple", "_spotify")
-# )
+# At this point any non-english songs do not match
+# Apple Music has track titles/artist names in their original languages
+# Spotify has them in english
+# The set of mismatches isn't massive, so we will have to just manually go through them
+# and make some mapping dictionary of japanese/korean -> english song titles/artist names
+merged_df = merged_df.dropna(subset=['track_name'])
 
 # # Go date by date
 # for date_value, group in apple_music_df.groupby('date_dt'):
