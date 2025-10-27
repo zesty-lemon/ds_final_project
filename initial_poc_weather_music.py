@@ -54,7 +54,7 @@ def clean_apple_music_fields(df: pd.DataFrame) -> pd.DataFrame:
 
 # read spotify music dataset into dataframe
 def get_spotify_tracks_as_df() -> pd.DataFrame:
-    base_path = "data/"
+    base_path = "data"
     spotify_dir = "/spotify/"
     input_file_spotify = os.path.join(base_path + spotify_dir, "spotify_million_tracks_data.csv")
     df = pd.read_csv(input_file_spotify)
@@ -64,7 +64,6 @@ def get_spotify_tracks_as_df() -> pd.DataFrame:
 
 
 # normalize song names to join apple & spotify datasets
-# written by ChatGPT
 def normalize_for_join(s: str) -> str:
     if pd.isna(s):
         return ""
@@ -252,6 +251,17 @@ merged_df = apple_music_df.merge(
     suffixes=("_apple", "_spotify")
 )
 
+merged_with_flag = apple_music_df.merge(
+    spotify_df[["song_key", "artist_key", "track_name", "artist_name"]],
+    on=["song_key", "artist_key"],
+    how="left",
+    suffixes=("_apple", "_spotify"),
+    indicator=True
+)
+
+unmatched = merged_with_flag.loc[merged_with_flag["_merge"] == "left_only"].copy()
+unique_unmatched_artists = unmatched["artist_key"].nunique(dropna=True)
+print("Unmatched Artist: ",unique_unmatched_artists, " out of ", apple_music_df["artist_key"].nunique(dropna=True), " total")
 # At this point any non-english songs do not match
 # Apple Music has track titles/artist names in their original languages
 # Spotify has them in english
