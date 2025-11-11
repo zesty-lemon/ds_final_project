@@ -16,6 +16,7 @@ all_dfs = []
 for city in city_list:
     print("----- ", city, "data -----")
     city_df = music_utils.get_music_data_by_city(city, True)
+    city_df["city"] = city
     all_dfs.append(city_df)
 
 unified_df = (pd.concat(all_dfs, ignore_index=True))
