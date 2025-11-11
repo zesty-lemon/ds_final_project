@@ -130,11 +130,3 @@ def get_music_data_by_city(city_name: str, print_stats: bool = True) -> pd.DataF
 
     city_df = get_music_and_data_df(city_name, apple_music_root, spotify_data_root, print_stats)
     return city_df
-
-
-# example usage
-city_list = ["atlanta","austin"]
-
-for city in city_list:
-    print("----- ",city, "data -----")
-    city_df = get_music_data_by_city(city, True)
