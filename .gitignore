@@ -199,3 +199,6 @@ log/
 spotify_million_tracks_data.csv
 # Coverage reports
 coverage/
+
+# weird directory MAC makes when unzipping files for no obvious reason
+**/__MACOSX/
