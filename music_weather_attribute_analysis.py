@@ -233,7 +233,12 @@ def run_music_weather_plots():
         corner=True,
         plot_kws={"alpha": 0.3, "s": 10},
     )
-    g.fig.suptitle("Relationships between music attributes and daily weather conditions", y=1.05)
+    g.fig.suptitle(
+        "Relationships between music attributes and daily weather conditions",
+        y=0.89,
+        fontsize=18
+    ) # move the title down, for some reason it wants to be way off the top
+    g.fig.tight_layout()
     save_plot("big_all_relationships_music_weather")
     plt.show()
 
