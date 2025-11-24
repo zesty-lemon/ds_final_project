@@ -66,7 +66,7 @@ def get_music_and_data_df(city: str, apple_music_root: str, spotify_data_root: s
     spotify_df = pd.read_excel(os.path.join(spotify_data_root, city + ".xlsx"))
     spotify_df = spotify_df.rename(columns={spotify_df.columns[0]: "SONG"})
     million_tracks_df = get_spotify_million_tracks_df()
-
+    apple_music_df["date"] = apple_music_df["DATE"]
     apple_music_df["SONG"] = apple_music_df["SONG"].map(normalize_title)
     spotify_df["SONG"] = spotify_df["SONG"].map(normalize_title)
 
