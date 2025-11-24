@@ -3,6 +3,13 @@ import os
 import pandas as pd
 import unicodedata
 import re
+import zipfile
+
+def unzip_spotify_million_tracks_csv_if_needed():
+    p = "data/spotify/spotify_million_tracks_data.csv"
+    if not os.path.exists(p):
+        print(f"Spotify Million tracks CSV not found at path {p} — unzipping...")
+        with zipfile.ZipFile(p + ".zip") as z: z.extractall(os.path.dirname(p))
 
 # normalize helper.  Remove punctuation marks
 def normalize_title(s):
