@@ -1,9 +1,16 @@
+import os
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 import build_music_weather_dataset as dataset_builder
+
+# helper: save the current figure into ./plots/
+def save_plot(name: str):
+    os.makedirs("plots", exist_ok=True)
+    plt.savefig(f"plots/{name}.png", dpi=300, bbox_inches="tight")
 
 #
 # Analysis of precipitation and music attributes (esp. danceability).
@@ -77,6 +84,7 @@ def run_music_weather_plots():
     plt.title("Correlation Between Precipitation and Music Attributes", fontsize=16, pad=12)
     plt.yticks(rotation=0, fontsize=10)
     plt.tight_layout()
+    save_plot("correlation_precip_music")
     plt.show()
 
     # ---------------------------------------------------------------------
@@ -113,6 +121,7 @@ def run_music_weather_plots():
     plt.title("Overall Correlation Between Weather and Music Attributes")
     plt.xticks(rotation=0)
     plt.tight_layout()
+    save_plot("correlation_all_weather_music")
     plt.show()
 
     # ---------------------------------------------------------------------
@@ -130,6 +139,7 @@ def run_music_weather_plots():
     ]
     ax.set_xticklabels(pretty_labels, rotation=35, ha="right")
     plt.tight_layout()
+    save_plot("distribution_dancability")
     plt.show()
 
     # ---------------------------------------------------------------------
@@ -140,6 +150,7 @@ def run_music_weather_plots():
     plt.title("Distribution of Daily Precipitation Across all Cities")
     plt.xlabel("Daily Precipitation (mm)")
     plt.tight_layout()
+    save_plot("distribution_daily_precip")
     plt.show()
 
     plt.figure(figsize=(10, 6))
@@ -147,6 +158,7 @@ def run_music_weather_plots():
     plt.title("Distribution of Daily Temperature Across All Cities")
     plt.xlabel("Daily Max Temperature")
     plt.tight_layout()
+    save_plot("distribution_daily_temp")
     plt.show()
 
     plt.figure(figsize=(10, 6))
@@ -154,6 +166,7 @@ def run_music_weather_plots():
     plt.title("Distribution of Daily Cloud Cover Across All Cities")
     plt.xlabel("Daily Mean Cloud Cover")
     plt.tight_layout()
+    save_plot("distribution_daily_cloud_cover")
     plt.show()
 
     # ---------------------------------------------------------------------
@@ -172,6 +185,7 @@ def run_music_weather_plots():
     plt.ylabel("Danceability")
     plt.title("Danceability vs Precipitation (LOWESS Smoothed)")
     plt.tight_layout()
+    save_plot("danceability_vs_precip_smoothed")
     plt.show()
 
     # ---------------------------------------------------------------------
@@ -192,6 +206,7 @@ def run_music_weather_plots():
     plt.ylabel("Danceability (3-day rolling mean)")
     plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
+    save_plot("rolling_avg_dancability")
     plt.show()
 
     # ---------------------------------------------------------------------
@@ -219,6 +234,7 @@ def run_music_weather_plots():
         plot_kws={"alpha": 0.3, "s": 10},
     )
     g.fig.suptitle("Relationships between music attributes and daily weather conditions", y=1.05)
+    save_plot("big_all_relationships_music_weather")
     plt.show()
 
 
