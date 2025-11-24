@@ -7,7 +7,7 @@ from weather_utils import join_music_and_weather
 
 
 # create dataset of the apple music dataset joined with spotify data joined with weather data
-def create_top_charts_song_data_weather_dataset(use_cache: bool = False):
+def create_top_charts_song_data_weather_dataset(use_weather_cache: bool = False):
     # Load unified music dataset
     unified_path = Path("data/script_outputs/music_dataset.parquet")
     if not unified_path.exists():
@@ -30,11 +30,12 @@ def create_top_charts_song_data_weather_dataset(use_cache: bool = False):
         g["date"] = pd.to_datetime(g["date"])
         full = pd.date_range(g["date"].min(), g["date"].max(), freq="D")
         missing = set(full) - set(g["date"])
+        # NOTE: There is a gap in data for around 18 days
         print(city, "missing days in MUSIC ONLY:", len(missing))
 
 
     # Join weather onto music rows
-    merged_df = join_music_and_weather(unified_df, city_list=city_list, date_col=date_col, use_cache=use_cache)
+    merged_df = join_music_and_weather(unified_df, city_list=city_list, date_col=date_col, use_weather_cache=use_weather_cache)
 
     # Save merged dataset
     out_path = Path("data/script_outputs/music_with_weather.parquet")

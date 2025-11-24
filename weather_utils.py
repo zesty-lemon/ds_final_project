@@ -1,4 +1,5 @@
 # weather_utils.py
+
 # pip install pandas pyarrow requests python-dateutil
 
 # Helper methods to pull weather data from open-meteorology weather API
@@ -7,6 +8,7 @@ import requests
 import pandas as pd
 from pathlib import Path
 from dateutil.parser import parse as parse_dt
+from tqdm import tqdm
 
 OPEN_METEO_GEOCODE = "https://geocoding-api.open-meteo.com/v1/search"
 OPEN_METEO_HIST = "https://archive-api.open-meteo.com/v1/archive"
@@ -94,14 +96,15 @@ def build_city_weather_table(song_df: pd.DataFrame,
                              city_list: list[str],
                              date_col: str = "date",
                              cache_dir: str = "data/weather_cache",
-                             use_cache: bool = True) -> pd.DataFrame:
+                             use_weather_cache: bool = True) -> pd.DataFrame:
     Path(cache_dir).mkdir(parents=True, exist_ok=True)
     start_date, end_date = infer_date_bounds(song_df, date_col=date_col)
+    print("--- BEGIN pulling weather data for cities---")
 
     frames = []
-    for city in city_list:
+    for city in tqdm(city_list, desc="Fetching weather", unit=" city"):
         cache_path = Path(cache_dir) / f"{city}_{start_date}_{end_date}.parquet"
-        if cache_path.exists() and use_cache:
+        if cache_path.exists() and use_weather_cache:
             city_weather = pd.read_parquet(cache_path)
         else:
             g = geocode_city(city)
@@ -112,17 +115,17 @@ def build_city_weather_table(song_df: pd.DataFrame,
             city_weather.to_parquet(cache_path, index=False)
         frames.append(city_weather)
 
+    print("--- END pulling weather data for cities---")
     if not frames:
         return pd.DataFrame()
     return pd.concat(frames, ignore_index=True)
-
 
 # Build the music -> city -> weather dataset
 # join music and weather together
 def join_music_and_weather(unified_music_df: pd.DataFrame,
                            city_list: list[str],
                            date_col: str = "date",
-                           use_cache: bool = True) -> pd.DataFrame:
+                           use_weather_cache: bool = True) -> pd.DataFrame:
     df = unified_music_df.copy()
 
     if "city" not in df.columns:
@@ -133,7 +136,7 @@ def join_music_and_weather(unified_music_df: pd.DataFrame,
     # normalize to Python date for exact match with weather
     df[date_col] = pd.to_datetime(df[date_col]).dt.date
 
-    weather_df = build_city_weather_table(df, city_list, date_col=date_col, use_cache=use_cache)
+    weather_df = build_city_weather_table(df, city_list, date_col=date_col, use_weather_cache=use_weather_cache)
     merged = df.merge(weather_df, left_on=["city", date_col], right_on=["city", "date"], how="left")
 
     # date_col is redundant if it still exists, so drop it

@@ -221,14 +221,6 @@ def run_music_weather_plots():
     g.fig.suptitle("Relationships between music attributes and daily weather conditions", y=1.05)
     plt.show()
 
-    # ---------------------------------------------------------------------
-    # 10. Misc Detritus
-    # ---------------------------------------------------------------------
-    # NOTE: There is a gap in data for around 18 days
-    for city, group in df_day.groupby("city"):
-        full = pd.date_range(group["date"].min(), group["date"].max())
-        missing = set(full) - set(group["date"])
-        print(city, "missing days:", len(missing))
 
 
 # Correlation on Delta (Change) in Weather vs Music

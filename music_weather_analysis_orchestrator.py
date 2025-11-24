@@ -3,12 +3,14 @@ import build_music_weather_dataset
 import music_weather_attribute_analysis
 
 # Create Dataset files used for analysis
-# if previously run on system, specify use_cache = true for performance improvement
-def create_dataset_files(use_cache: bool = False):
+# if previously run on system, specify use_weather_cache = true for performance improvement
+def create_dataset_files(use_music_cache: bool = False, use_weather_cache: bool = False):
     # Pull the Music dataset from /data directory, unify it, and save to parquet files
-    create_music_dataset.build_music_dataset_and_save_to_parquet()
+    if not use_music_cache:
+        create_music_dataset.build_music_dataset_and_save_to_parquet()
+
     # Pull Weather Data, Join to Music Data, and save as .parquet file
-    build_music_weather_dataset.create_top_charts_song_data_weather_dataset(use_cache=use_cache)
+    build_music_weather_dataset.create_top_charts_song_data_weather_dataset(use_weather_cache=use_weather_cache)
 
 
 # Perform Data Analysis on Music and Weather
@@ -21,6 +23,7 @@ def perform_analysis_on_music_weather_data():
 
 if __name__ == "__main__":
     # Prepare Data for Analysis
-    create_dataset_files()
+    # for performance, set both to true after running once
+    create_dataset_files(use_music_cache = True, use_weather_cache = True)
     # Perform Data Analysis
     perform_analysis_on_music_weather_data()
