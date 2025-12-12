@@ -85,3 +85,41 @@ python music_weather_attribute_analysis.py
     `/plots/` directory.
 
 ------------------------------------------------------------------------
+
+## Politics vs. Music Analysis
+
+------------------------------------------------------------------------
+
+### 1. Run Data Preparation
+
+Execute the following script:
+
+``` bash
+python create_music_and_political_dataset.py
+```
+
+By default, this script will:
+    - Create a .parquet file that holds the merged political and musical data
+
+------------------------------------------------------------------------
+
+### 2. Run Main Analysis
+
+Execute the analysis script:
+
+``` bash
+python music_politics_analysis.py
+```
+
+By default, this script will:
+    - Run the entire descriptive, explanatory, and descriptive analysis between politics and music
+    - Saves plots to /plots folder
+
+------------------------------------------------------------------------
+
+### 3. Output
+
+- Plots will be displayed during execution
+- They are also saved to /plots/ to be viewed when needed
+
+------------------------------------------------------------------------
