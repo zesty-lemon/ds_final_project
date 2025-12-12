@@ -100,7 +100,7 @@ python create_music_and_political_dataset.py
 ```
 
 By default, this script will:
-    - Create a .parquet file that holds the merged political and musical data
+- Create a .parquet file that holds the merged political and musical data
 
 ------------------------------------------------------------------------
 
@@ -113,8 +113,8 @@ python music_politics_analysis.py
 ```
 
 By default, this script will:
-    - Run the entire descriptive, explanatory, and descriptive analysis between politics and music
-    - Saves plots to /plots folder
+- Run the entire descriptive, explanatory, and descriptive analysis between politics and music
+- Saves plots to /plots folder
 
 ------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ python data_tanslator.py
 ```
 
 By default, this script will:
-    - Create a .xlsx file that holds the tranlated music data of all 16 cities in Translated Folder
+- Create a .xlsx file that holds the tranlated music data of all 16 cities in Translated Folder
 
 ------------------------------------------------------------------------
 
@@ -150,8 +150,8 @@ python Demographic_Data.py
 ```
 
 By default, this script will:
-    - Create a .csv file that holds all the demographic data
-    - files saved in project folder
+- Create a .csv file that holds all the demographic data
+- files saved in project folder
 
 ------------------------------------------------------------------------
 ### 2. Run Main Analysis
@@ -166,9 +166,9 @@ python music_demographic_eda.py
 ```
 
 By default, this script will:
-    - The first code will run the entire descriptive, explanatory, and descriptive analysis for music
-    - The second code will run the entire descriptive, explanatory, and descriptive analysis between demographic and music
-    - Saves plots to /plots folder
+- The first code will run the entire descriptive, explanatory, and descriptive analysis for music
+- The second code will run the entire descriptive, explanatory, and descriptive analysis between demographic and music
+- Saves plots to /plots folder
 
 ------------------------------------------------------------------------
 
