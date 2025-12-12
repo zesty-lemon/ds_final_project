@@ -3,6 +3,13 @@ import os
 import pandas as pd
 import unicodedata
 import re
+import zipfile
+
+def unzip_spotify_million_tracks_csv_if_needed():
+    p = "data/spotify/spotify_million_tracks_data.csv"
+    if not os.path.exists(p):
+        print(f"Spotify Million tracks CSV not found at path {p} — unzipping...")
+        with zipfile.ZipFile(p + ".zip") as z: z.extractall(os.path.dirname(p))
 
 # normalize helper.  Remove punctuation marks
 def normalize_title(s):
@@ -66,7 +73,7 @@ def get_music_and_data_df(city: str, apple_music_root: str, spotify_data_root: s
     spotify_df = pd.read_excel(os.path.join(spotify_data_root, city + ".xlsx"))
     spotify_df = spotify_df.rename(columns={spotify_df.columns[0]: "SONG"})
     million_tracks_df = get_spotify_million_tracks_df()
-
+    apple_music_df["date"] = apple_music_df["DATE"]
     apple_music_df["SONG"] = apple_music_df["SONG"].map(normalize_title)
     spotify_df["SONG"] = spotify_df["SONG"].map(normalize_title)
 
@@ -130,11 +137,3 @@ def get_music_data_by_city(city_name: str, print_stats: bool = True) -> pd.DataF
 
     city_df = get_music_and_data_df(city_name, apple_music_root, spotify_data_root, print_stats)
     return city_df
-
-
-# example usage
-city_list = ["atlanta","austin"]
-
-for city in city_list:
-    print("----- ",city, "data -----")
-    city_df = get_music_data_by_city(city, True)

@@ -1,0 +1,48 @@
+-----  atlanta data -----
+Atlanta First Pass: 19/250 unique unmatched songs (7.6%)
+Atlanta Second Pass: 10/250 unique unmatched songs (4.0%)
+-----  austin data -----
+Austin First Pass: 11/198 unique unmatched songs (5.6%)
+Austin Second Pass: 5/198 unique unmatched songs (2.5%)
+-----  chicago data -----
+Chicago First Pass: 27/218 unique unmatched songs (12.4%)
+Chicago Second Pass: 14/218 unique unmatched songs (6.4%)
+-----  dallas data -----
+Dallas First Pass: 21/240 unique unmatched songs (8.8%)
+Dallas Second Pass: 12/240 unique unmatched songs (5.0%)
+-----  denver data -----
+Denver First Pass: 20/233 unique unmatched songs (8.6%)
+Denver Second Pass: 12/233 unique unmatched songs (5.2%)
+-----  detroit data -----
+Detroit First Pass: 20/227 unique unmatched songs (8.8%)
+Detroit Second Pass: 11/227 unique unmatched songs (4.8%)
+-----  honolulu data -----
+Honolulu First Pass: 14/178 unique unmatched songs (7.9%)
+Honolulu Second Pass: 7/178 unique unmatched songs (3.9%)
+-----  houston data -----
+Houston First Pass: 16/200 unique unmatched songs (8.0%)
+Houston Second Pass: 8/200 unique unmatched songs (4.0%)
+-----  los_angeles data -----
+Los_Angeles First Pass: 23/199 unique unmatched songs (11.6%)
+Los_Angeles Second Pass: 15/199 unique unmatched songs (7.5%)
+-----  miami data -----
+Miami First Pass: 14/209 unique unmatched songs (6.7%)
+Miami Second Pass: 8/209 unique unmatched songs (3.8%)
+-----  new_york_city data -----
+New_York_City First Pass: 15/210 unique unmatched songs (7.1%)
+New_York_City Second Pass: 9/210 unique unmatched songs (4.3%)
+-----  philadelphia data -----
+Philadelphia First Pass: 24/230 unique unmatched songs (10.4%)
+Philadelphia Second Pass: 14/230 unique unmatched songs (6.1%)
+-----  san_francisco data -----
+San_Francisco First Pass: 19/219 unique unmatched songs (8.7%)
+San_Francisco Second Pass: 12/219 unique unmatched songs (5.5%)
+-----  san_diego data -----
+San_Diego First Pass: 22/220 unique unmatched songs (10.0%)
+San_Diego Second Pass: 15/220 unique unmatched songs (6.8%)
+-----  seattle data -----
+Seattle First Pass: 19/232 unique unmatched songs (8.2%)
+Seattle Second Pass: 10/232 unique unmatched songs (4.3%)
+-----  washington_DC data -----
+Washington_Dc First Pass: 20/278 unique unmatched songs (7.2%)
+Washington_Dc Second Pass: 13/278 unique unmatched songs (4.7%)
