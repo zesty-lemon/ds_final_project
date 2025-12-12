@@ -199,80 +199,39 @@ def plot_explanatory_regressions(df):
     music_targets = {
         "Danceability": "danceability",
         "Valence": "valence",
-        "Energy": "energy",
+        "Energy": "energy"
     }
 
-    pol_vars = [
-        "covid_index",
-        "economic_index",
-        "biden_index",
-        "social_index",
-        "gov_index",
-    ]
+    pol_vars = ["covid_index", "economic_index", "biden_index", "social_index", "gov_index"]
 
-    fig, axes = plt.subplots(
-        nrows=len(pol_vars),
-        ncols=len(music_targets),
-        figsize=(18, 20),
-        dpi=120,
-        sharex=False,
-        sharey=False
-    )
+    plt.figure(figsize=(24, 22))
+    idx = 1
 
-    for row, pol in enumerate(pol_vars):
-        for col, (label, music_col) in enumerate(music_targets.items()):
+    for pol in pol_vars:
+        for label, col in music_targets.items():
 
-            ax = axes[row, col]
-            valid = daily[[pol, music_col]].dropna()
+            plt.subplot(5, 3, idx)
+            valid = daily[[pol, col]].dropna()
 
-            model = LinearRegression().fit(valid[[pol]], valid[music_col])
-            r2 = model.score(valid[[pol]], valid[music_col])
+            model = LinearRegression().fit(valid[[pol]], valid[col])
+            r2 = model.score(valid[[pol]], valid[col])
 
             sns.regplot(
                 x=pol,
-                y=music_col,
+                y=col,
                 data=daily,
-                ax=ax,
-                scatter_kws={"alpha": 0.35, "s": 18},
-                line_kws={"color": "red", "lw": 2}
+                scatter_kws={"alpha": 0.4, "s": 25},
+                line_kws={"color": "red"}
             )
 
-            # Column titles (top row only)
-            if row == 0:
-                ax.set_title(label, fontsize=13, fontweight="bold", pad=10)
+            plt.title(f"{pretty(pol)} vs {label} (R²={r2:.2f})", fontsize=10)
+            plt.xlabel(pretty(pol))
+            plt.ylabel(label)
 
-            # Row labels (left column only)
-            if col == 0:
-                ax.set_ylabel(pretty(pol), fontsize=11)
-            else:
-                ax.set_ylabel("")
+            idx += 1
 
-            ax.set_xlabel("")
-
-            # R² annotation (inside plot, bottom-right)
-            ax.text(
-                0.95,
-                0.05,
-                f"$R^2 = {r2:.2f}$",
-                transform=ax.transAxes,
-                ha="right",
-                va="bottom",
-                fontsize=10,
-                bbox=dict(facecolor="white", alpha=0.8, edgecolor="none")
-            )
-
-    # Figure-level title (THIS is key)
-    fig.suptitle(
-        "Explanatory Relationships Between Political Indices and Music Attributes",
-        fontsize=18,
-        fontweight="bold",
-        y=0.995
-    )
-
-    # Extra vertical spacing to prevent overlap
-    plt.subplots_adjust(hspace=0.35, wspace=0.25)
-
-    save_plot("political_explanatory_regressions_fixed")
+    plt.tight_layout()
+    save_plot("political_explanatory_regressions")
     plt.show()
 
 # ---------------------------------------------------------------------
